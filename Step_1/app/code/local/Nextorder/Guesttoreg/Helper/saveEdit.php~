@@ -1,0 +1,7 @@
+<?php
+    $postData = $_POST["editedContent"];
+    isset($postData){
+
+        echo "Gepostete Daten sind schon da gewesen!";
+    }
+?>

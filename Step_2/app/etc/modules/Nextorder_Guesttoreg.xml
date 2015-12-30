@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nextorder_Guesttoreg>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Nextorder_Guesttoreg>
+    </modules>
+</config>

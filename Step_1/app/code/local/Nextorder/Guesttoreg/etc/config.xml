@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nextorder_Guesttoreg>
+            <version>0.1.0</version>
+        </Nextorder_Guesttoreg>
+    </modules>
+    <global>
+        <helpers>
+            <guesttoreg>
+                <class>Nextorder_Guesttoreg_Helper</class>
+            </guesttoreg>
+        </helpers>
+        <blocks>
+            <guesttoreg>
+                <class>Nextorder_Guesttoreg_Block</class>
+            </guesttoreg>
+        </blocks>
+        <models>
+            <guesttoreg>
+                <class>Nextorder_Guesttoreg_Model</class>
+            </guesttoreg>
+        </models>
+        <events>
+            <sales_order_place_after>
+                <observers>
+                    <guesttoreg_sales_order_place_after>
+                        <type>singleton</type>
+                        <class>guesttoreg/observer</class>
+                        <method>_afterOrderPlaced</method>
+                    </guesttoreg_sales_order_place_after>
+                </observers>
+            </sales_order_place_after>
+        </events>
+
+    </global>
+
+    <frontend>
+        <routers>
+            <guesttoreg>
+                <use>standard</use>
+                <args>
+                    <module>Nextorder_Guesttoreg</module>
+                    <frontName>guesttoreg</frontName>
+                </args>
+            </guesttoreg>
+        </routers>
+        <!--<layout>-->
+            <!--<updates>-->
+                <!--<guesttoreg module="Nextorder_Guesttoreg">-->
+                <!--</guesttoreg>-->
+            <!--</updates>-->
+        <!--</layout>-->
+
+    </frontend>
+
+    <!--<admin>-->
+        <!--<routers>-->
+            <!--<refundadmin>-->
+                <!--<use>admin</use>-->
+                <!--<args>-->
+                    <!--<module>Nextorder_Refundbanking</module>-->
+                    <!--<frontName>refundadmin</frontName>-->
+                <!--</args>-->
+            <!--</refundadmin>-->
+        <!--</routers>-->
+    <!--</admin>-->
+
+    <!--<adminhtml>-->
+        <!--<layout>-->
+            <!--<updates>-->
+                <!--<refundbanking>-->
+                    <!--<file>nextorder_refundbanking.xml</file>-->
+                <!--</refundbanking>-->
+        <!--</updates>-->
+        <!--</layout>-->
+    <!--</adminhtml>-->
+
+</config>
