@@ -44,19 +44,20 @@
         public function index_2Action(){
 
             $billingAddress = Mage::getModel('customer/customer')->load(1)->getPrimaryBillingAddress();
-            Zend_Debug::dump($billingAddress->getStreet(2));
+            Zend_Debug::dump($billingAddress->getData());
         }
 
         public function index_3Action(){
 
-            $billingID = Mage::getModel("sales/order")->load(14)->getBillingAddress()->getId();
+            $billingID = Mage::getModel("sales/order")->loadByIncrementId(100000049)->getBillingAddress()->getId();
+            echo Mage::getModel("sales/order")->loadByIncrementId(100000049)->getId(). "<br/>";
             $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
-            Zend_Debug::dump($addressForOrder->getStreet(3));
+            Zend_Debug::dump($addressForOrder->getData());
         }
 
         public function index_4Action(){
             $toCustomer = Mage::getModel('customer/customer')->load(1);
-            $order = Mage::getModel('sales/order')->loadByIncrementId('100000047');
+            $order = Mage::getModel('sales/order')->loadByIncrementId('100000061');
 //            echo $order->getCustomerId();
             $order->setCustomerId()->save();
         }

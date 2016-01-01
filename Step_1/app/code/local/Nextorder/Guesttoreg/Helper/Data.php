@@ -3,24 +3,12 @@
 class Nextorder_Guesttoreg_Helper_Data extends Mage_Core_Helper_Abstract{
 
 
-    public function _nameCheck($ref, $param){
+    public function _orderAssign($order, $customerID){
 
-        $compareArray = array();
-        $customerCollection = Mage::getModel('customer/customer')->getCollection()
-            ->addAttributeToSelect('*')
-            ->addAttributeToFilter($ref, array('like' => $param));
+//        $order_new = Mage::getModel('sales/order')->loadByIncrementId('100000063');
+        $order->setCustomerId(1)->save();
 
-        foreach($customerCollection as $customer){
-
-            $rechnung_Lastname = $customer->getPrimaryBillingAddress()->getData("lastname");
-            if((!empty($rechnung_Lastname)) && ($rechnung_Lastname != $customer->getData($ref))){
-                $compareArray[] = $rechnung_Lastname;
-            }else{
-                $compareArray[] = $param;
-            };
-        }
-
-        return $compareArray;
+        return Mage::log("Result: WTF!!!!".$order->getId()."_".$customerID, null, 'xulin.log');;
     }
 }
 ?>

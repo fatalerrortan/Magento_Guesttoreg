@@ -22,7 +22,8 @@
             </guesttoreg>
         </models>
         <events>
-            <sales_order_place_after>
+            <!--<sales_order_place_after>-->
+            <sales_order_save_commit_after>
                 <observers>
                     <guesttoreg_sales_order_place_after>
                         <type>singleton</type>
@@ -30,7 +31,8 @@
                         <method>_afterOrderPlaced</method>
                     </guesttoreg_sales_order_place_after>
                 </observers>
-            </sales_order_place_after>
+            </sales_order_save_commit_after>
+            <!--</sales_order_place_after>-->
         </events>
 
     </global>
