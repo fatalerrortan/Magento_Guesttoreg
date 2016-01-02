@@ -22,17 +22,28 @@
             </guesttoreg>
         </models>
         <events>
+
+            <!--<sales_order_save_commit_after>-->
+                <!---->
+            <!--</sales_order_save_commit_after>-->
+
             <!--<sales_order_place_after>-->
-            <sales_order_save_commit_after>
+          <!---->
+            <!--</sales_order_place_after>-->
+
+            <checkout_submit_all_after>
                 <observers>
-                    <guesttoreg_sales_order_place_after>
+                    <guesttoreg_event_for_order_assign>
                         <type>singleton</type>
                         <class>guesttoreg/observer</class>
-                        <method>_afterOrderPlaced</method>
-                    </guesttoreg_sales_order_place_after>
+                        <method>_afterOrderSaved</method>
+                    </guesttoreg_event_for_order_assign>
                 </observers>
-            </sales_order_save_commit_after>
-            <!--</sales_order_place_after>-->
+            </checkout_submit_all_after>
+
+            <!--<sales_order_place_before>-->
+            <!--</sales_order_place_before>-->
+
         </events>
 
     </global>

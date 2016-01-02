@@ -33,11 +33,11 @@
             $orderCollection = Mage::getModel("sales/order")->getCollection()
                 ->addFieldToSelect('*')
                 ->addFieldToFilter('customer_is_guest',1)
-                ->addFieldToFilter('increment_id', 100000031);
+                ->addFieldToFilter('increment_id', 100000057);
 
             foreach( $orderCollection  as $eachorder){
 
-                Zend_Debug::dump($eachorder);
+                Zend_Debug::dump($eachorder->getData());
             }
         }
 
@@ -56,9 +56,10 @@
         }
 
         public function index_4Action(){
-            $toCustomer = Mage::getModel('customer/customer')->load(1);
-            $order = Mage::getModel('sales/order')->loadByIncrementId('100000061');
+            $toCustomer = Mage::getModel('customer/customer')->load(1)->getData();
+//            $order = Mage::getModel('sales/order')->loadByIncrementId('100000061');
 //            echo $order->getCustomerId();
-            $order->setCustomerId()->save();
+//            $order->setCustomerId()->save();
+            print_r($toCustomer);
         }
     }
