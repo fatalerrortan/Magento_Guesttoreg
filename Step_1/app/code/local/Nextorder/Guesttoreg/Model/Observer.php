@@ -12,9 +12,12 @@ class Nextorder_Guesttoreg_Model_Observer{
             $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
             $GuestLastName = $addressForOrder->getData("lastname");
             $GuestFirstName = $addressForOrder->getData("firstname");
-            $GuestGender = $this->getDataFromCollection($orderInkreID, "customer_gender");
+            $GuestPrefix = $this->getDataFromCollection($orderInkreID, "customer_prefix");
+            if($GuestPrefix == "Herr"){
+                $GuestPrefixCode = 1;
+            }else{$GuestPrefixCode = 2;}
 
-            $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestGender);
+            $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefixCode);
 
             if(count($result) == 0){
                 return Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
@@ -46,23 +49,23 @@ class Nextorder_Guesttoreg_Model_Observer{
         $index_customers = count($shop_customers_collection);
         for($i = 1;$i <= $index_customers; $i++){
             $customer = Mage::getModel('customer/customer')->load($i);
-            $billingAddress = $customer->getPrimaryBillingAddress();
-            if($billingAddress == false){
-//                Mage::log("No Billinf Ad. ". $customer->getId(), null, 'xulin.log');
-                continue;
-            }else {
+//            $billingAddress = $customer->getPrimaryBillingAddress();
+//            if($billingAddress == false){
+//               Mage::log("No Billinf Ad. ". $customer->getId(), null, 'xulin.log');
+//                continue;
+//            }else {
+//            Mage::log($gender ."     ".$customer->getData('gender'), null, 'xulin.log');
                 if(
-                    ($sound_firstname == soundex($billingAddress->getFirstname()))
+                    ($sound_firstname == soundex($customer->getFirstname()))
                     &&
-                    ($sound_lastname == soundex($billingAddress->getLastname()))
-//!!!Waiting for Amasty_addressattr!!!
-//                    &&
-//                    ($gender == $billingAddress->getData('gender'))
-//!!!Waiting for Amasty_addressattr!!!
+                    ($sound_lastname == soundex($customer->getLastname()))
+                    &&
+//                    Herr 1, Frau 2
+                    ($gender == $customer->getData('gender'))
                 ){$matchedOrders[] = $i;}
             }
-        }
-//        Mage::log($matchedOrders, null, 'xulin.log');
+//        }
+        Mage::log($matchedOrders, null, 'xulin.log');
         return $matchedOrders;
     }
 
@@ -76,8 +79,20 @@ class Nextorder_Guesttoreg_Model_Observer{
         $GuestCity = $addressForOrder->getData("city");
         $indexForHold = 0;
         foreach($preMatcheds as $preMatched){
-            $billingAddress = Mage::getModel('customer/customer')->load($preMatched)->getPrimaryBillingAddress();
-            if($formatTel != $this->getFormatTel($billingAddress->getData("telephone"))){
+            $basicCustomerData = Mage::getModel('customer/customer')->load($preMatched);
+            $billingAddress = $basicCustomerData->getPrimaryBillingAddress();
+            if(
+                ($billingAddress == false)
+            ||
+                ($basicCustomerData->getFirstname() != $billingAddress->getFirstname())
+            ||
+                ($basicCustomerData->getLastname() != $billingAddress->getLastname())
+            ){
+//                Mage::log("no same Default Address", null, 'xulin.log');
+                continue;
+            }
+            else{
+                if($formatTel != $this->getFormatTel($billingAddress->getData("telephone"))){
 //                Mage::log("Result: NO Matched Customer! ". $formatTel. " and ".$this->getFormatTel($billingAddress->getData("telephone")), null, 'xulin.log');
                 continue;
             }else{
@@ -107,6 +122,7 @@ class Nextorder_Guesttoreg_Model_Observer{
                         }
                     }
                 }
+              }
             }
         }
         return array('status'=>'hold');
