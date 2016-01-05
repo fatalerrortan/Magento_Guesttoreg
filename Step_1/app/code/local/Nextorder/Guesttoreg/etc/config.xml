@@ -67,6 +67,19 @@
 
     </frontend>
 
+    <crontab>
+        <jobs>
+            <generate_new_customer_from_guest>
+                <schedule>
+                    <cron_expr>*/20 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>guesttoreg/Cron::_readOrders</model>
+                </run>
+            </generate_new_customer_from_guest>
+        </jobs>
+    </crontab>
+
     <!--<admin>-->
         <!--<routers>-->
             <!--<refundadmin>-->

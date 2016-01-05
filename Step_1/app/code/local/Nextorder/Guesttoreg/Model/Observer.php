@@ -12,7 +12,9 @@ class Nextorder_Guesttoreg_Model_Observer{
             $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
             $GuestLastName = $addressForOrder->getData("lastname");
             $GuestFirstName = $addressForOrder->getData("firstname");
-            $GuestPrefix = $this->getDataFromCollection($orderInkreID, "customer_prefix");
+//            $GuestPrefix = $this->getDataFromCollection($orderInkreID, "customer_prefix");
+            $GuestPrefix = $addressForOrder->getData('prefix');
+//            Mage::log("Prefix: ". $addressForOrder->getData('prefix'), null, 'xulin.log');
             if($GuestPrefix == "Herr"){
                 $GuestPrefixCode = 1;
             }else{$GuestPrefixCode = 2;}
@@ -20,7 +22,13 @@ class Nextorder_Guesttoreg_Model_Observer{
             $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefixCode);
 
             if(count($result) == 0){
+                $base_path = Mage::getBaseDir('base');
+                if(!is_dir($base_path."/media/new_customer")) {
+                    mkdir($base_path . "/media/new_customer", 0777);
+                }
+                file_put_contents($base_path."/media/new_customer/customer_generate.txt", $orderInkreID.",",FILE_APPEND);
                 return Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
+
             }
             else{
                 $dataToAssign = $this->getFullMatched($result, $orderInkreID, $addressForOrder);
@@ -42,29 +50,24 @@ class Nextorder_Guesttoreg_Model_Observer{
         $matchedOrders = array();
         $sound_lastname = soundex($lastname);
         $sound_firstname = soundex($firstname);
-
-//        Mage::log("Result: Vorname: ".$sound_firstname." Nachname: ".$sound_lastname, null, 'xulin.log');
-
-        $shop_customers_collection = Mage::getModel('customer/customer')->getCollection();
-        $index_customers = count($shop_customers_collection);
-        for($i = 1;$i <= $index_customers; $i++){
-            $customer = Mage::getModel('customer/customer')->load($i);
-//            $billingAddress = $customer->getPrimaryBillingAddress();
-//            if($billingAddress == false){
-//               Mage::log("No Billinf Ad. ". $customer->getId(), null, 'xulin.log');
-//                continue;
-//            }else {
-//            Mage::log($gender ."     ".$customer->getData('gender'), null, 'xulin.log');
-                if(
-                    ($sound_firstname == soundex($customer->getFirstname()))
-                    &&
-                    ($sound_lastname == soundex($customer->getLastname()))
-                    &&
+//        Mage::log("searching Match for ". $sound_firstname."  ".$sound_lastname."   ".$gender , null, 'xulin.log');
+        $customers = Mage::getModel('customer/customer')->getCollection()
+            ->addAttributeToSelect('firstname')
+            ->addAttributeToSelect('lastname')
+            ->addAttributeToSelect('gender');
+        foreach($customers as $customer){
+            if(
+                ($sound_firstname == soundex($customer->getFirstname()))
+                &&
+                ($sound_lastname == soundex($customer->getLastname()))
+                &&
 //                    Herr 1, Frau 2
-                    ($gender == $customer->getData('gender'))
-                ){$matchedOrders[] = $i;}
+                ($gender == $customer->getGender())
+            ){
+                $matchedOrders[] = $customer->getId();
             }
-//        }
+//            else{Mage::log("failed to Match ". soundex($customer->getFirstname())."  ".soundex($customer->getLastname())."   ".$customer->getGender(), null, 'xulin.log');}
+        }
         Mage::log($matchedOrders, null, 'xulin.log');
         return $matchedOrders;
     }
@@ -73,7 +76,7 @@ class Nextorder_Guesttoreg_Model_Observer{
 
         $GuestTel = $addressForOrder->getData("telephone");
         $formatTel = $this->getFormatTel($GuestTel);
-        $GuestEmail = $this->getDataFromCollection($orderInkreID, "customer_email");
+        $GuestEmail = $addressForOrder->getData("email");
         $GuestPLZ = $addressForOrder->getData("postcode");
         $GuestStreet = $addressForOrder->getStreet(1).$addressForOrder->getStreet(2).$addressForOrder->getStreet(3);
         $GuestCity = $addressForOrder->getData("city");
@@ -88,35 +91,35 @@ class Nextorder_Guesttoreg_Model_Observer{
             ||
                 ($basicCustomerData->getLastname() != $billingAddress->getLastname())
             ){
-//                Mage::log("no same Default Address", null, 'xulin.log');
+                Mage::log("no same Default Address", null, 'xulin.log');
                 continue;
             }
             else{
                 if($formatTel != $this->getFormatTel($billingAddress->getData("telephone"))){
-//                Mage::log("Result: NO Matched Customer! ". $formatTel. " and ".$this->getFormatTel($billingAddress->getData("telephone")), null, 'xulin.log');
+                Mage::log("Result: NO Matched Customer! ". $formatTel. " and ".$this->getFormatTel($billingAddress->getData("telephone")), null, 'xulin.log');
                 continue;
             }else{
                 if($GuestEmail != Mage::getModel('customer/customer')->load($preMatched)->getData("email")){
-//                    Mage::log("Result: NO Matched Customer! ". $GuestEmail, null, 'xulin.log');
+                    Mage::log("Result: NO Matched Customer! ". $GuestEmail, null, 'xulin.log');
                     continue;
                 }else{
                     if($GuestPLZ != $billingAddress->getData("postcode")){
-//                        Mage::log("Result: NO Matched Customer! ". $GuestPLZ, null, 'xulin.log');
+                        Mage::log("Result: NO Matched Customer! ". $GuestPLZ, null, 'xulin.log');
                         continue;
                     }else{
                         $GuestStreet_sound = soundex(strtolower(str_replace(' ','',$GuestStreet)));
                         $sound_billingStreet = soundex(strtolower(str_replace(' ','',$billingAddress->getStreet(1).$billingAddress->getStreet(2).$billingAddress->getStreet(3))));
                         if($GuestStreet_sound != $sound_billingStreet){
-//                            Mage::log("Result: NO Matched Customer! ". $GuestStreet, null, 'xulin.log');
+                            Mage::log("Result: NO Matched Customer! ". $GuestStreet, null, 'xulin.log');
                             continue;
                         }else{
                             $sound_city = soundex(strtolower(str_replace(' ','', $GuestCity)));
                             $sound_billingCity = soundex(strtolower(str_replace(' ','', $billingAddress->getData("city"))));
                             if($sound_city != $sound_billingCity){
-//                                Mage::log("Result: NO Matched Customer! ". $GuestCity, null, 'xulin.log');
+                                Mage::log("Result: NO Matched Customer! ". $GuestCity, null, 'xulin.log');
                                 continue;
                             }else{
-//                                Mage::log("Result: Matched Customer! ". $orderInkreID, null, 'xulin.log');
+                                Mage::log("Result: Matched Customer! ". $orderInkreID, null, 'xulin.log');
                                 return array('status'=>'matched','customerid'=>$preMatched);
                             }
                         }
