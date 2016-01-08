@@ -5,6 +5,7 @@
  * Date: 04.01.16
  * Time: 17:36
  */
+require_once dirname(__FILE__)."/Classes/PHPExcel.php";
 class Nextorder_Guesttoreg_Model_Cron{
 
 //    protected $cron_status = false;
@@ -14,12 +15,17 @@ class Nextorder_Guesttoreg_Model_Cron{
         $base_path = Mage::getBaseDir('base');
         $orgin_string = file_get_contents($base_path."/media/new_customer/customer_generate.txt");
         $string_to_array = explode(',',$orgin_string);
+        $dataToExcel = array();
         foreach($string_to_array as $orderInkreId){
             if(!empty($orderInkreId)){
-                $this->_customerGenerate((int)$orderInkreId);
+               $customerId = $this->_customerGenerate((int)$orderInkreId);
+               $dataToExcel[] = array('customerid'=> $customerId, 'orderinkreid'=>$orderInkreId);
             }
         }
+        $path_for_excel = $this->_generateExcel($dataToExcel);
         file_put_contents($base_path."/media/new_customer/customer_generate.txt", "");
+
+        return "Die mitgenerierte Excel-Datei über die neuen Kunden und zugeordneten befindet sich auf ".$path_for_excel;
     }
 
     protected function _customerGenerate($orderInkreId){
@@ -44,6 +50,8 @@ class Nextorder_Guesttoreg_Model_Cron{
         $customer->save();
         $this->_orderAssign($orderInkreId, $customer->getId());
         $this->_setDefaultBillingAdress($billingID, $customer->getId());
+
+        return $customer->getId();
     }
 
     protected function _setDefaultBillingAdress($billingID, $customerid){
@@ -75,6 +83,7 @@ class Nextorder_Guesttoreg_Model_Cron{
             ->setSaveInAddressBook('1');
         $customAddress->save();
 
+        return true;
     }
 
     protected function _orderAssign($orderInkreId, $customerid){
@@ -89,5 +98,43 @@ class Nextorder_Guesttoreg_Model_Cron{
         $order->setCustomerGroupId($customer->getData('group_id'));
         $order->addStatusHistoryComment('Generiert von Gast Bestellung(Neue Kunden)');
         $order->save();
+
+        return true;
+    }
+
+    public function _generateExcel($dataToExcel){
+
+        /** Error reporting */
+        error_reporting(E_ALL);
+        ini_set('display_errors', TRUE);
+        ini_set('display_startup_errors', TRUE);
+        date_default_timezone_set('Europe/Berlin');
+        define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+
+        $objPHPExcel = new PHPExcel();
+// Set document properties
+        $adminUser = Mage::getSingleton('admin/session')->getUser()->getUsername();
+        $objPHPExcel->getProperties()->setCreator($adminUser)
+            ->setLastModifiedBy($adminUser)
+            ->setTitle("New Customers Generate at ".date("Y.m.d"))
+            ->setSubject("New Customers Generate at ".date("Y.m.d"))
+            ->setDescription("Cron generates New Customers and assigns order to Customers at ".date("Y.m.d"))
+            ->setKeywords("New Customers")
+            ->setCategory("New Customers");
+// Add some data
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', 'Customer ID')
+                                            ->setCellValue('B1', 'Assigned Increment Order ID');
+            $index = 2;
+            foreach($dataToExcel as $row){
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$index, $row['customerid'])
+                                                    ->setCellValue('B'.$index, $row['orderinkreid']);
+                $index++;
+            }
+// Save Excel 2007 file
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
+        rename(str_replace('.php', '.xlsx', __FILE__), Mage::getBaseDir("base")."/media/new_customer/New_Customers_".date("Y.m.d").".xlsx");
+
+        return Mage::getBaseDir("base")."/media/new_customer/New_Customers_".date("Y.m.d").".xlsx";
     }
 }
