@@ -3,12 +3,17 @@
 class Nextorder_Guesttoreg_Helper_Data extends Mage_Core_Helper_Abstract{
 
 
-    public function _orderAssign($order, $customerID){
+    public function _getOrdersInVerdacht(){
 
-//        $order_new = Mage::getModel('sales/order')->loadByIncrementId('100000063');
-        $order->setCustomerId(1)->save();
+        $options = array();
+        $base_path = Mage::getBaseDir('base');
+        $orgin_string = file_get_contents($base_path."/media/new_customer/customer_verdacht.txt");
+        $objects = explode('&',$orgin_string);
+        foreach($objects as $object){
+            $options[] = array("value"=>(int)strstr($object, "@", true), "label"=>strstr($object, "@", true));
+        }
 
-        return Mage::log("Result: WTF!!!!".$order->getId()."_".$customerID, null, 'xulin.log');;
+        return $options;
     }
 }
 ?>

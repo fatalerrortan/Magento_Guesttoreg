@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <section_reg translate="title" module="guesttoreg">
+                                       <title>Gast Bestellung Kontroller</title>
+                                    </section_reg>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

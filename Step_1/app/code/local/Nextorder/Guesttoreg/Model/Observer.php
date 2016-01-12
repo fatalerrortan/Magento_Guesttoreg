@@ -12,40 +12,45 @@ class Nextorder_Guesttoreg_Model_Observer{
             $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
             $GuestLastName = $addressForOrder->getData("lastname");
             $GuestFirstName = $addressForOrder->getData("firstname");
-//            $GuestPrefix = $this->getDataFromCollection($orderInkreID, "customer_prefix");
             $GuestPrefix = $addressForOrder->getData('prefix');
-//            Mage::log("Prefix: ". $addressForOrder->getData('prefix'), null, 'xulin.log');
+            $GuestEmail = $addressForOrder->getData("email");
             if($GuestPrefix == "Herr"){
                 $GuestPrefixCode = 1;
             }else{$GuestPrefixCode = 2;}
 
-            $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefixCode);
+            $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefixCode, $GuestEmail);
+            $base_path = Mage::getBaseDir('base');
 
-            if(count($result) == 0){
-                $base_path = Mage::getBaseDir('base');
-                if(!is_dir($base_path."/media/new_customer")) {
-                    mkdir($base_path . "/media/new_customer", 0777);
-                }
-                file_put_contents($base_path."/media/new_customer/customer_generate.txt", $orderInkreID.",",FILE_APPEND);
-                return Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
-
-            }
-            else{
-                $dataToAssign = $this->getFullMatched($result, $orderInkreID, $addressForOrder);
-                if($dataToAssign['status'] == 'matched'){
-                    $order_saved = Mage::getModel('sales/order')->loadByIncrementId($orderInkreID);
-                    $this->_assignOrder($order_saved, $dataToAssign['customerid']);
+            if($result['status'] != "emailmatched"){
+                if(count($result['customerids']) == 0){
+                    if(!is_dir($base_path."/media/new_customer")) {
+                        mkdir($base_path . "/media/new_customer", 0777);
+                    }
+                    file_put_contents($base_path."/media/new_customer/customer_generate.txt", $orderInkreID.",",FILE_APPEND);
+                    return Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
                 }else{
-                    return Mage::log("Result: To Hold! ". $orderInkreID, null, 'xulin.log');
+                    $dataToAssign = $this->getFullMatched($result['customerids'], $orderInkreID, $addressForOrder);
+                    if($dataToAssign['status'] == 'matched'){
+                        $order_saved = Mage::getModel('sales/order')->loadByIncrementId($orderInkreID);
+                        $this->_assignOrder($order_saved, $dataToAssign['customerid']);
+                    }else{
+//                    return Mage::log("Result: To Hold! ". $orderInkreID, null, 'xulin.log');
+                        if(!is_dir($base_path."/media/new_customer")) {
+                            mkdir($base_path . "/media/new_customer", 0777);
+                        }
+                        file_put_contents($base_path."/media/new_customer/customer_verdacht.txt", $orderInkreID."@".implode(",",$result)."&",FILE_APPEND);
+                        return Mage::log("Result: Order to Hold! ". $orderInkreID, null, 'xulin.log');
+                    }
                 }
+            }else{
+                $order_saved = Mage::getModel('sales/order')->loadByIncrementId($orderInkreID);
+                $this->_assignOrder($order_saved, (int)$result['customerid']);
+                return Mage::log("Result: matched by Email! ". $orderInkreID, null, 'xulin.log');
             }
-//            Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
-//            $order_saved = Mage::getModel('sales/order')->loadByIncrementId($orderInkreID);
-//            $this->_assignOrder($order_saved);
         }
     }
 
-    public function getPreMatched($lastname, $firstname, $gender){
+    public function getPreMatched($lastname, $firstname, $gender, $email){
 
         $matchedOrders = array();
         $sound_lastname = soundex($lastname);
@@ -54,8 +59,13 @@ class Nextorder_Guesttoreg_Model_Observer{
         $customers = Mage::getModel('customer/customer')->getCollection()
             ->addAttributeToSelect('firstname')
             ->addAttributeToSelect('lastname')
-            ->addAttributeToSelect('gender');
+            ->addAttributeToSelect('gender')
+            ->addAttributeToSelect('email');
         foreach($customers as $customer){
+
+            if($email == $customer->getEmail()){
+                return array("status"=>"emailmatched", "customerid"=>$customer->getId());
+            }
             if(
                 ($sound_firstname == soundex($customer->getFirstname()))
                 &&
@@ -69,14 +79,14 @@ class Nextorder_Guesttoreg_Model_Observer{
 //            else{Mage::log("failed to Match ". soundex($customer->getFirstname())."  ".soundex($customer->getLastname())."   ".$customer->getGender(), null, 'xulin.log');}
         }
         Mage::log($matchedOrders, null, 'xulin.log');
-        return $matchedOrders;
+        return array("status"=>"searching", "customerids"=>$matchedOrders);
     }
 
     public function getFullMatched($preMatcheds, $orderInkreID, $addressForOrder){
 
         $GuestTel = $addressForOrder->getData("telephone");
         $formatTel = $this->getFormatTel($GuestTel);
-        $GuestEmail = $addressForOrder->getData("email");
+//        $GuestEmail = $addressForOrder->getData("email");
         $GuestPLZ = $addressForOrder->getData("postcode");
         $GuestStreet = $addressForOrder->getStreet(1).$addressForOrder->getStreet(2).$addressForOrder->getStreet(3);
         $GuestCity = $addressForOrder->getData("city");
@@ -92,16 +102,17 @@ class Nextorder_Guesttoreg_Model_Observer{
                 ($basicCustomerData->getLastname() != $billingAddress->getLastname())
             ){
                 Mage::log("no same Default Address", null, 'xulin.log');
+                Mage::log($basicCustomerData->getFirstname(), null, 'xulin.log');
+                Mage::log($basicCustomerData->getLastname(), null, 'xulin.log');
+                Mage::log($billingAddress->getFirstname(), null, 'xulin.log');
+                Mage::log($billingAddress->getLastname(), null, 'xulin.log');
+//                Mage::log($basicCustomerData->getFirstname()." ".$basicCustomerData->getLastname()." ".$billingAddress->getFirstname()." ".$billingAddress->getLastname(), null, 'xulin.log');
                 continue;
             }
             else{
                 if($formatTel != $this->getFormatTel($billingAddress->getData("telephone"))){
                 Mage::log("Result: NO Matched Customer! ". $formatTel. " and ".$this->getFormatTel($billingAddress->getData("telephone")), null, 'xulin.log');
                 continue;
-            }else{
-                if($GuestEmail != Mage::getModel('customer/customer')->load($preMatched)->getData("email")){
-                    Mage::log("Result: NO Matched Customer! ". $GuestEmail, null, 'xulin.log');
-                    continue;
                 }else{
                     if($GuestPLZ != $billingAddress->getData("postcode")){
                         Mage::log("Result: NO Matched Customer! ". $GuestPLZ, null, 'xulin.log');
@@ -125,9 +136,9 @@ class Nextorder_Guesttoreg_Model_Observer{
                         }
                     }
                 }
-              }
             }
         }
+
         return array('status'=>'hold');
     }
 

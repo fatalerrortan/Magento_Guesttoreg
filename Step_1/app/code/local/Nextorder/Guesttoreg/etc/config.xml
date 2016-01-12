@@ -43,6 +43,15 @@
 
             <!--<sales_order_place_before>-->
             <!--</sales_order_place_before>-->
+            <admin_system_config_changed_section_section_reg>
+                <observers>
+                    <guesttoreg_event_for_order_assign_from_admin>
+                        <type>singleton</type>
+                        <class>guesttoreg/adminconfig</class>
+                        <method>_orderAssignformAdmin</method>
+                    </guesttoreg_event_for_order_assign_from_admin>
+                </observers>
+            </admin_system_config_changed_section_section_reg>
 
         </events>
 
@@ -77,6 +86,15 @@
                     <model>guesttoreg/Cron::_readOrders</model>
                 </run>
             </generate_new_customer_from_guest>
+
+            <customer_check_from_guest>
+                <schedule>
+                    <cron_expr>*/20 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>guesttoreg/Verdacht::_verdachtExcel</model>
+                </run>
+            </customer_check_from_guest>
         </jobs>
     </crontab>
 
@@ -103,3 +121,9 @@
     <!--</adminhtml>-->
 
 </config>
+
+
+
+
+
+
