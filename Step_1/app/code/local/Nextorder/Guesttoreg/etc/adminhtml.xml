@@ -1,20 +1,28 @@
 <?xml version="1.0" ?>
 <config>
+    <menu>
+        <sales>
+            <children>
+               <guesttoreg translate="title">
+                   <title>Gast Bestelung</title>
+                   <sort_order>13</sort_order>
+                   <action>adminhtml/index/index</action>
+               </guesttoreg>
+            </children>
+        </sales>
+    </menu>
     <acl>
         <resources>
             <admin>
                 <children>
-                    <system>
-                        <children>
-                            <config>
-                                <children>
-                                    <section_reg translate="title" module="guesttoreg">
-                                       <title>Gast Bestellung Kontroller</title>
-                                    </section_reg>
-                                </children>
-                            </config>
-                        </children>
-                    </system>
+                   <sales>
+                       <children>
+                           <guesttoreg translate="title" module="guesttoreg">
+                               <title>Gast Bestelung</title>
+                               <sort_order>13</sort_order>
+                           </guesttoreg>
+                       </children>
+                   </sales>
                 </children>
             </admin>
         </resources>

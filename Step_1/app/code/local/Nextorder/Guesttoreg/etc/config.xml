@@ -76,6 +76,28 @@
 
     </frontend>
 
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <guesttoreg before="Mage_Adminhtml">Nextorder_Guesttoreg_Adminhtml</guesttoreg>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+
+    <adminhtml>
+        <layout>
+            <updates>
+                <guesttoreg>
+                    <file>nextorder_guesttoreg.xml</file>
+                </guesttoreg>
+            </updates>
+        </layout>
+    </adminhtml>
+
     <crontab>
         <jobs>
             <generate_new_customer_from_guest>
@@ -110,15 +132,7 @@
         <!--</routers>-->
     <!--</admin>-->
 
-    <!--<adminhtml>-->
-        <!--<layout>-->
-            <!--<updates>-->
-                <!--<refundbanking>-->
-                    <!--<file>nextorder_refundbanking.xml</file>-->
-                <!--</refundbanking>-->
-        <!--</updates>-->
-        <!--</layout>-->
-    <!--</adminhtml>-->
+
 
 </config>
 

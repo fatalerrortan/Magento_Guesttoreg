@@ -102,10 +102,10 @@ class Nextorder_Guesttoreg_Model_Observer{
                 ($basicCustomerData->getLastname() != $billingAddress->getLastname())
             ){
                 Mage::log("no same Default Address", null, 'xulin.log');
-                Mage::log($basicCustomerData->getFirstname(), null, 'xulin.log');
-                Mage::log($basicCustomerData->getLastname(), null, 'xulin.log');
-                Mage::log($billingAddress->getFirstname(), null, 'xulin.log');
-                Mage::log($billingAddress->getLastname(), null, 'xulin.log');
+//                Mage::log($basicCustomerData->getFirstname(), null, 'xulin.log');
+//                Mage::log($basicCustomerData->getLastname(), null, 'xulin.log');
+//                Mage::log($billingAddress->getFirstname(), null, 'xulin.log');
+//                Mage::log($billingAddress->getLastname(), null, 'xulin.log');
 //                Mage::log($basicCustomerData->getFirstname()." ".$basicCustomerData->getLastname()." ".$billingAddress->getFirstname()." ".$billingAddress->getLastname(), null, 'xulin.log');
                 continue;
             }
