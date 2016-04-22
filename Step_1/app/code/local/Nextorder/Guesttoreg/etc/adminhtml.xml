@@ -6,7 +6,7 @@
                <guesttoreg translate="title">
                    <title>Gast Bestelung</title>
                    <sort_order>13</sort_order>
-                   <action>adminhtml/index/index</action>
+                   <action>adminhtml/guesttoreg/index</action>
                </guesttoreg>
             </children>
         </sales>

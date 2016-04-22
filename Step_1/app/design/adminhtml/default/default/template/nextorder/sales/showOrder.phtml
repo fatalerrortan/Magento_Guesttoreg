@@ -1,0 +1,58 @@
+<table border="1px" width="100%">
+    <tr style="background: gold">
+        <td>Bestellung Inkrement ID</td>
+        <td>Vorname</td>
+        <td>Nachname</td>
+        <td>Email</td>
+        <td>Telefon</td>
+        <td>Adresse</td>
+        <td>PLZ</td>
+        <td>Stadt</td>
+        <td>Staat</td>
+        <td>An diesen Kunden zuordnen</td>
+    </tr>
+    <tr style="color:blue">
+        <td><?php echo $this->loadOrderCollection()['inkrementId']?></td>
+        <td><?php echo $this->loadOrderCollection()['vorname']?></td>
+        <td><?php echo $this->loadOrderCollection()['nachname']?></td>
+        <td><?php echo $this->loadOrderCollection()['email']?></td>
+        <td><?php echo $this->loadOrderCollection()['telefon']?></td>
+        <td><?php echo $this->loadOrderCollection()['street']?></td>
+        <td><?php echo $this->loadOrderCollection()['postcode']?></td>
+        <td><?php echo $this->loadOrderCollection()['city']?></td>
+        <td><?php echo $this->loadOrderCollection()['country']?></td>
+        <td>Gast Bestellung</td>
+    </tr>
+   <form method="get" action="<?php echo str_replace('index.php/','index.php/admin',Mage::helper("adminhtml")->getUrl("admin/guesttoreg/assign")); ?>">
+
+       <?php
+       foreach($this->getSusCustomers()[0] as $customerId){
+
+           $customerDetail = $this->getCustomerDetails((int)$customerId);
+           If($customerDetail == false){continue;}
+           else{
+               echo "<tr>
+                      <td style='color: red'>Im Verdacht</td>
+                      <td>".$customerDetail['vorname']."</td>
+                      <td>".$customerDetail['nachname']."</td>
+                      <td>".$customerDetail['email']."</td>
+                      <td>".$customerDetail['telefon']."</td>
+                      <td>".$customerDetail['street']."</td>
+                      <td>".$customerDetail['postcode']."</td>
+                      <td>".$customerDetail['city']."</td>
+                      <td>".$customerDetail['country']."</td>
+                      <td><input type='radio' name='customerid' value=".$customerId."> KundenID: ".$customerId."</td>
+                  </tr>";
+           }
+       }
+       ?>
+       <input type="hidden" name="increId" value="<?php echo $this->loadOrderCollection()['inkrementId'] ?>" />
+       <input type="hidden" name="indexForRemove" value="<?php echo $this->getSusCustomers()[1] ?>" />
+       <tr style="color: blue"><td>Neuer Kunde</td>---<td>---</td><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td>
+           <td><input type='radio' name='customerid' value='new' />Neuer Kunde</td>
+       </tr>
+       <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td align="right"><input type="submit" value="Zuordnen" /></td></tr>
+   </form>
+</table>
+
+<?php //echo str_replace('index.php/','index.php/admin',Mage::helper("adminhtml")->getUrl("admin/guesttoreg/assign")) ?>

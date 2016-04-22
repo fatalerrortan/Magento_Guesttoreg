@@ -16,10 +16,13 @@ class Nextorder_Guesttoreg_Model_Cron{
         $orgin_string = file_get_contents($base_path."/media/new_customer/customer_generate.txt");
         $string_to_array = explode(',',$orgin_string);
         $dataToExcel = array();
+        $duplicateForEmail = array();
         foreach($string_to_array as $orderInkreId){
             if(!empty($orderInkreId)){
-               $customerId = $this->_customerGenerate((int)$orderInkreId);
-               $dataToExcel[] = array('customerid'=> $customerId, 'orderinkreid'=>$orderInkreId);
+
+               $result = $this->_customerGenerate((int)$orderInkreId, $duplicateForEmail);
+               $duplicateForEmail[] = $result[1];
+               $dataToExcel[] = array('customerid'=> $result[0], 'orderinkreid'=>$orderInkreId);
             }
         }
         $path_for_excel = $this->_generateExcel($dataToExcel);
@@ -28,11 +31,17 @@ class Nextorder_Guesttoreg_Model_Cron{
         return "Die mitgenerierte Excel-Datei über die neuen Kunden und zugeordneten befindet sich auf ".$path_for_excel;
     }
 
-    protected function _customerGenerate($orderInkreId){
+    protected function _customerGenerate($orderInkreId, $emailPool){
 
         $order = Mage::getModel("sales/order")->loadByIncrementId($orderInkreId);
         $billingID = $order->getBillingAddress()->getId();
         $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
+
+        if(in_array($addressForOrder->getData("email"), $emailPool)){
+
+            $this->_orderAssignByEmail($orderInkreId, $addressForOrder->getData("email"));
+        }
+
 
 //        $websiteId = Mage::app()->getWebsite()->getId();
         $websiteId = Mage::getModel('core/store')->load($order->getStoreId())->getWebsiteId();
@@ -51,7 +60,7 @@ class Nextorder_Guesttoreg_Model_Cron{
         $this->_orderAssign($orderInkreId, $customer->getId());
         $this->_setDefaultBillingAdress($billingID, $customer->getId());
 
-        return $customer->getId();
+        return array($customer->getId(), $addressForOrder->getData("email"));
     }
 
     protected function _setDefaultBillingAdress($billingID, $customerid){
@@ -94,6 +103,22 @@ class Nextorder_Guesttoreg_Model_Cron{
         $customer = Mage::getModel("customer/customer")->load($customerid);
         $customer->setWebsiteId($websiteId);
         $order->setCustomerId($customerid);
+        $order->setCustomerIsGuest(0);
+        $order->setCustomerGroupId($customer->getData('group_id'));
+        $order->addStatusHistoryComment('Generiert von Gast Bestellung(Neue Kunden)');
+        $order->save();
+
+        return true;
+    }
+
+    protected function _orderAssignByEmail($orderInkreId, $email){
+
+        $order = Mage::getModel("sales/order")->loadByIncrementId($orderInkreId);
+        $storeId = $order->getStoreId();
+        $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+        $customer = Mage::getModel("customer/customer")->loadByEmail($email);
+        $customer->setWebsiteId($websiteId);
+        $order->setCustomerId($customer->getId());
         $order->setCustomerIsGuest(0);
         $order->setCustomerGroupId($customer->getData('group_id'));
         $order->addStatusHistoryComment('Generiert von Gast Bestellung(Neue Kunden)');

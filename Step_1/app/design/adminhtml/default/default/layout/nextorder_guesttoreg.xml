@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <adminhtml_guesttoreg_index>
+        <!--<remove name="header" />-->
+    </adminhtml_guesttoreg_index>
+
+    <adminhtml_guesttoreg_orderadmin>
+        <!--<remove name="header" />-->
+        <reference name="content">
+            <!--<action method="setTemplate">-->
+                <!--<template>nextorder/sales/showOrder.phtml</template>-->
+            <!--</action>-->
+
+            <block type="guesttoreg/adminhtml_sales_orderassign" name="orderAssign" template="nextorder/sales/showOrder.phtml" />
+
+        </reference>
+    </adminhtml_guesttoreg_orderadmin>
+</layout>

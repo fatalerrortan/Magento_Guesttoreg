@@ -12,13 +12,14 @@ class Nextorder_Guesttoreg_Model_Observer{
             $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
             $GuestLastName = $addressForOrder->getData("lastname");
             $GuestFirstName = $addressForOrder->getData("firstname");
-            $GuestPrefix = $addressForOrder->getData('prefix');
+            $GuestPrefix = (int)$order->getData('customer_gender');
+//            Mage::log($GuestPrefix , null, 'xulin.log');
             $GuestEmail = $addressForOrder->getData("email");
-            if($GuestPrefix == "Herr"){
-                $GuestPrefixCode = 1;
-            }else{$GuestPrefixCode = 2;}
+//            if($GuestPrefix == "Herr"){
+//                $GuestPrefixCode = 1;
+//            }else{$GuestPrefixCode = 2;}
 
-            $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefixCode, $GuestEmail);
+            $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefix, $GuestEmail);
             $base_path = Mage::getBaseDir('base');
 
             if($result['status'] != "emailmatched"){
@@ -27,6 +28,8 @@ class Nextorder_Guesttoreg_Model_Observer{
                         mkdir($base_path . "/media/new_customer", 0777);
                     }
                     file_put_contents($base_path."/media/new_customer/customer_generate.txt", $orderInkreID.",",FILE_APPEND);
+                    $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/media/new_customer/customer_generate.txt"));
+                    file_put_contents($base_path."/media/new_customer/customer_generate.txt", $urString);
                     return Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
                 }else{
                     $dataToAssign = $this->getFullMatched($result['customerids'], $orderInkreID, $addressForOrder);
@@ -38,7 +41,9 @@ class Nextorder_Guesttoreg_Model_Observer{
                         if(!is_dir($base_path."/media/new_customer")) {
                             mkdir($base_path . "/media/new_customer", 0777);
                         }
-                        file_put_contents($base_path."/media/new_customer/customer_verdacht.txt", $orderInkreID."@".implode(",",$result)."&",FILE_APPEND);
+                        file_put_contents($base_path."/media/new_customer/customer_verdacht.txt", $orderInkreID."@".implode(",",$result['customerids'])."&",FILE_APPEND);
+                        $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/media/new_customer/customer_verdacht.txt"));
+                        file_put_contents($base_path."/media/new_customer/customer_generate.txt", $urString);
                         return Mage::log("Result: Order to Hold! ". $orderInkreID, null, 'xulin.log');
                     }
                 }
@@ -61,6 +66,7 @@ class Nextorder_Guesttoreg_Model_Observer{
             ->addAttributeToSelect('lastname')
             ->addAttributeToSelect('gender')
             ->addAttributeToSelect('email');
+        $i = 0;
         foreach($customers as $customer){
 
             if($email == $customer->getEmail()){
@@ -77,8 +83,10 @@ class Nextorder_Guesttoreg_Model_Observer{
                 $matchedOrders[] = $customer->getId();
             }
 //            else{Mage::log("failed to Match ". soundex($customer->getFirstname())."  ".soundex($customer->getLastname())."   ".$customer->getGender(), null, 'xulin.log');}
+        $i++;
         }
         Mage::log($matchedOrders, null, 'xulin.log');
+        Mage::log("times: ".$i, null, 'xulin.log');
         return array("status"=>"searching", "customerids"=>$matchedOrders);
     }
 

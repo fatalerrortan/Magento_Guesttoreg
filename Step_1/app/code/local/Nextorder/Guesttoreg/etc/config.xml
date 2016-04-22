@@ -79,10 +79,13 @@
     <admin>
         <routers>
             <adminhtml>
+                <!--<use>admin</use>-->
                 <args>
                     <modules>
                         <guesttoreg before="Mage_Adminhtml">Nextorder_Guesttoreg_Adminhtml</guesttoreg>
                     </modules>
+                    <!--<module before="Mage_Adminhtml">Nextorder_Guesttoreg_Adminhtml</module>-->
+                    <!--<frontName>guesttoregadmin</frontName>-->
                 </args>
             </adminhtml>
         </routers>
