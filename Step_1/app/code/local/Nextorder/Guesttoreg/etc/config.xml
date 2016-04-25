@@ -40,19 +40,6 @@
                     </guesttoreg_event_for_order_assign>
                 </observers>
             </checkout_submit_all_after>
-
-            <!--<sales_order_place_before>-->
-            <!--</sales_order_place_before>-->
-            <admin_system_config_changed_section_section_reg>
-                <observers>
-                    <guesttoreg_event_for_order_assign_from_admin>
-                        <type>singleton</type>
-                        <class>guesttoreg/adminconfig</class>
-                        <method>_orderAssignformAdmin</method>
-                    </guesttoreg_event_for_order_assign_from_admin>
-                </observers>
-            </admin_system_config_changed_section_section_reg>
-
         </events>
 
     </global>

@@ -9,7 +9,13 @@
 
         public function indexAction(){
 
-		echo "it works";
+            $collection = Mage::getResourceModel('sales/order_collection')
+                ->addFieldToSelect('*')
+                ->addFieldToFilter('increment_id', 1000000017);
+            Zend_Debug::dump($collection);
+
+//            $orderCollection = Mage::getModel("sales/order")->loadByIncrementId(1000000017)->getCollection();
+//            Zend_Debug::dump($orderCollection);
         }
 
         public function index_1Action(){

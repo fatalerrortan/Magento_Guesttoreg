@@ -32,16 +32,22 @@
            If($customerDetail == false){continue;}
            else{
                echo "<tr>
+
                       <td style='color: red'>Im Verdacht</td>
-                      <td>".$customerDetail['vorname']."</td>
+                      <td><a href=". Mage::helper('adminhtml')->getUrl('adminhtml/customer/edit/id/'.$customerId). "' target='_blank'>".$customerDetail['vorname']."</a></td>
                       <td>".$customerDetail['nachname']."</td>
-                      <td>".$customerDetail['email']."</td>
+                      <td><a href=". Mage::helper('adminhtml')->getUrl('adminhtml/customer/edit/id/'.$customerId). "' target='_blank'>".$customerDetail['email']."</a></td>
                       <td>".$customerDetail['telefon']."</td>
                       <td>".$customerDetail['street']."</td>
                       <td>".$customerDetail['postcode']."</td>
                       <td>".$customerDetail['city']."</td>
                       <td>".$customerDetail['country']."</td>
-                      <td><input type='radio' name='customerid' value=".$customerId."> KundenID: ".$customerId."</td>
+
+                      <td>
+                        <a href=". Mage::helper('adminhtml')->getUrl('adminhtml/customer/edit/id/'.$customerId). "' target='_blank'>
+                            <input type='radio' name='customerid' value=".$customerId."> KundenID: ".$customerId."
+                        </a>
+                      </td>
                   </tr>";
            }
        }
@@ -54,5 +60,6 @@
        <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td align="right"><input type="submit" value="Zuordnen" /></td></tr>
    </form>
 </table>
+
 
 <?php //echo str_replace('index.php/','index.php/admin',Mage::helper("adminhtml")->getUrl("admin/guesttoreg/assign")) ?>
