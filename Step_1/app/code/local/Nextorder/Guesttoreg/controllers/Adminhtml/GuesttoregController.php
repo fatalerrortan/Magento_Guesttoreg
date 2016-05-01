@@ -42,7 +42,7 @@ class Nextorder_Guesttoreg_Adminhtml_GuesttoregController extends Mage_Adminhtml
         $this->loadLayout();
         $this->_addContent($this->getLayout()->createBlock('guesttoreg/adminhtml_sales_orderassign'));
         $this->renderLayout();
-    }
+}
 
     public function assignAction(){
 
@@ -54,9 +54,9 @@ class Nextorder_Guesttoreg_Adminhtml_GuesttoregController extends Mage_Adminhtml
         }
         $base_path = Mage::getBaseDir('base');
         if($params['customerid'] == 0){
-            file_put_contents($base_path."/media/new_customer/customer_generate.txt", $params['increId'].",",FILE_APPEND);
-            $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/media/new_customer/customer_generate.txt"));
-            file_put_contents($base_path."/media/new_customer/customer_generate.txt", $urString);
+            file_put_contents($base_path."/var/new_customer/customer_generate.txt", $params['increId'].",",FILE_APPEND);
+            $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/var/new_customer/customer_generate.txt"));
+            file_put_contents($base_path."/var/new_customer/customer_generate.txt", $urString);
             $this->_removeDataFromSus($base_path, $params['indexForRemove']);
             Mage::getSingleton('core/session')->addSuccess('Sie haben die Bestellung als neuen Kunden gestellt. Bitte führen Sie das Job(generate_new_customer_from_guest) der Extension(Aoe_Scheduler) um den neuen Kunden zu generieren!');
             Mage::app()->getResponse()->setRedirect(str_replace('index.php/','index.php/admin',Mage::helper("adminhtml")->getUrl("admin/guesttoreg/index")));
@@ -70,8 +70,8 @@ class Nextorder_Guesttoreg_Adminhtml_GuesttoregController extends Mage_Adminhtml
 
     private function _removeDataFromSus($baseUrl, $removeIndex){
 
-        $rmDataFromSus = file_get_contents($baseUrl."/media/new_customer/customer_verdacht.txt");
-        file_put_contents($baseUrl."/media/new_customer/customer_verdacht.txt", str_replace($removeIndex."&","",$rmDataFromSus));
+        $rmDataFromSus = file_get_contents($baseUrl."/var/new_customer/customer_verdacht.txt");
+        file_put_contents($baseUrl."/var/new_customer/customer_verdacht.txt", str_replace($removeIndex."&","",$rmDataFromSus));
         return true;
     }
 

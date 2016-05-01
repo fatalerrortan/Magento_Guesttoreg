@@ -28,7 +28,7 @@
        <?php
        foreach($this->getSusCustomers()[0] as $customerId){
 
-           $customerDetail = $this->getCustomerDetails((int)$customerId);
+           $customerDetail = $this->getCustomerDetails($customerId);
            If($customerDetail == false){continue;}
            else{
                echo "<tr>

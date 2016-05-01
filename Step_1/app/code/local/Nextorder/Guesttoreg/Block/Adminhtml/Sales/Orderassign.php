@@ -10,7 +10,7 @@
 
      public function loadOrderCollection(){
 
-         $inkreId = (int)$this->getRequest()->getParam('orderid');
+         $inkreId = $this->getRequest()->getParam('orderid');
          $order = Mage::getModel("sales/order")->loadByIncrementId($inkreId);
          $billingID = $order->getBillingAddress()->getId();
          $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
@@ -30,13 +30,13 @@
 
      public function getSusCustomers(){
 
-         $inkreId = (int)$this->getRequest()->getParam('orderid');
+         $inkreId = $this->getRequest()->getParam('orderid');
          $base_path = Mage::getBaseDir('base');
-         $orgin_string = file_get_contents($base_path."/media/new_customer/customer_verdacht.txt");
+         $orgin_string = file_get_contents($base_path."/var/new_customer/customer_verdacht.txt");
          $string_to_array = explode('&',$orgin_string);
          foreach($string_to_array as $item){
 
-             if((int)strstr($item,"@",true) == $inkreId){
+             if(strstr($item,"@",true) == $inkreId){
                  $customerIdArray = explode(',',substr(strstr($item,"@"), 1));
                  return array($customerIdArray, $item);
              }
@@ -44,7 +44,7 @@
      }
 
      public function getCustomerDetails($customerId){
-
+         ;
          $customer = Mage::getModel('customer/customer')->load($customerId);
          $billingAddress = $customer->getPrimaryBillingAddress();
         if($billingAddress == false){

@@ -9,7 +9,7 @@
 
         public function indexAction(){
 
-		echo "it works";
+            echo "this is a Test";
         }
 
         public function index_1Action(){

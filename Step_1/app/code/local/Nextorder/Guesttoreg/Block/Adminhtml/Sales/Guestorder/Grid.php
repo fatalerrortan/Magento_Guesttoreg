@@ -23,6 +23,7 @@ class Nextorder_Guesttoreg_Block_Adminhtml_Sales_Guestorder_Grid extends Mage_Ad
         $collection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToSelect('*')
             ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
+            ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
             ->addFieldToFilter('customer_group_id', 0);
 
         $this->setCollection($collection);
@@ -114,7 +115,7 @@ class Nextorder_Guesttoreg_Block_Adminhtml_Sales_Guestorder_Grid extends Mage_Ad
 
     public function getSusOrder(){
         $base_path = Mage::getBaseDir('base');
-        $orgin_string = file_get_contents($base_path."/media/new_customer/customer_generate.txt");
+        $orgin_string = file_get_contents($base_path."/var/new_customer/customer_generate.txt");
         return  explode(',',$orgin_string);
     }
 }

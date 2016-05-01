@@ -10,28 +10,25 @@ class Nextorder_Guesttoreg_Model_Cron{
 
 //    protected $cron_status = false;
 
+    public $duplicateForEmail = array();
     public function _readOrders(){
 
         $base_path = Mage::getBaseDir('base');
-        $orgin_string = file_get_contents($base_path."/media/new_customer/customer_generate.txt");
+        $orgin_string = file_get_contents($base_path."/var/new_customer/customer_generate.txt");
         $string_to_array = explode(',',$orgin_string);
-        $dataToExcel = array();
-        $duplicateForEmail = array();
+//        array_pop($string_to_array);
+        unset($string_to_array[count($string_to_array)-1]);
         foreach($string_to_array as $orderInkreId){
-            if(!empty($orderInkreId)){
 
-               $result = $this->_customerGenerate((int)$orderInkreId, $duplicateForEmail);
-               $duplicateForEmail[] = $result[1];
-               $dataToExcel[] = array('customerid'=> $result[0], 'orderinkreid'=>$orderInkreId);
-            }
+                $result = $this->_customerGenerate($orderInkreId, $this->duplicateForEmail);
+                $this->duplicateForEmail[] = $result[1];
         }
-        $path_for_excel = $this->_generateExcel($dataToExcel);
-        file_put_contents($base_path."/media/new_customer/customer_generate.txt", "");
-
-        return "Die mitgenerierte Excel-Datei über die neuen Kunden und zugeordneten befindet sich auf ".$path_for_excel;
+        file_put_contents($base_path."/var/new_customer/customer_generate.txt", "");
+        return "Neue Kunden sind generiert worden.";
     }
 
     protected function _customerGenerate($orderInkreId, $emailPool){
+
 
         $order = Mage::getModel("sales/order")->loadByIncrementId($orderInkreId);
         $billingID = $order->getBillingAddress()->getId();
@@ -148,18 +145,18 @@ class Nextorder_Guesttoreg_Model_Cron{
             ->setCategory("New Customers");
 // Add some data
         $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', 'Customer ID')
-                                            ->setCellValue('B1', 'Assigned Increment Order ID');
-            $index = 2;
-            foreach($dataToExcel as $row){
-                $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$index, $row['customerid'])
-                                                    ->setCellValue('B'.$index, $row['orderinkreid']);
-                $index++;
-            }
+            ->setCellValue('B1', 'Assigned Increment Order ID');
+        $index = 2;
+        foreach($dataToExcel as $row){
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$index, $row['customerid'])
+                ->setCellValue('B'.$index, $row['orderinkreid']);
+            $index++;
+        }
 // Save Excel 2007 file
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
-        rename(str_replace('.php', '.xlsx', __FILE__), Mage::getBaseDir("base")."/media/new_customer/New_Customers_".date("Y.m.d").".xlsx");
+        rename(str_replace('.php', '.xlsx', __FILE__), Mage::getBaseDir("base")."/var/new_customer/New_Customers_".date("Y.m.d").".xlsx");
 
-        return Mage::getBaseDir("base")."/media/new_customer/New_Customers_".date("Y.m.d").".xlsx";
+        return Mage::getBaseDir("base")."/var/new_customer/New_Customers_".date("Y.m.d").".xlsx";
     }
 }

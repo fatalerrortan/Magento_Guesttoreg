@@ -11,7 +11,7 @@ class Nextorder_Guesttoreg_Model_Verdacht{
     public function _verdachtExcel(){
 
         $base_path = Mage::getBaseDir('base');
-        $orgin_string = file_get_contents($base_path."/media/new_customer/customer_verdacht.txt");
+        $orgin_string = file_get_contents($base_path."/var/new_customer/customer_verdacht.txt");
         $string_to_array = explode('&',$orgin_string);
         $dataToExcel = array();
         foreach($string_to_array as $object){
@@ -57,8 +57,8 @@ class Nextorder_Guesttoreg_Model_Verdacht{
 // Save Excel 2007 file
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
-        rename(str_replace('.php', '.xlsx', __FILE__), Mage::getBaseDir("base")."/media/new_customer/Verdacht_".date("Y.m.d").".xlsx");
+        rename(str_replace('.php', '.xlsx', __FILE__), Mage::getBaseDir("base")."/var/new_customer/Verdacht_".date("Y.m.d").".xlsx");
 
-        return Mage::getBaseDir("base")."/media/new_customer/Verdacht_".date("Y.m.d").".xlsx";
+        return Mage::getBaseDir("base")."/var/new_customer/Verdacht_".date("Y.m.d").".xlsx";
     }
 }

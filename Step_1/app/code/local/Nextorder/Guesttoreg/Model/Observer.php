@@ -3,7 +3,7 @@
 class Nextorder_Guesttoreg_Model_Observer{
 
     public function _afterOrderSaved(Varien_Event_Observer $event){
-		Mage::log("Order empfangen!", null, 'xulin.log');
+
         $roleId = Mage::getSingleton('customer/session')->getCustomerGroupId();
         if($roleId == 0) {
             $order = $event->getEvent()->getOrder();
@@ -12,25 +12,21 @@ class Nextorder_Guesttoreg_Model_Observer{
             $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
             $GuestLastName = $addressForOrder->getData("lastname");
             $GuestFirstName = $addressForOrder->getData("firstname");
-            $GuestPrefix = (int)$order->getData('customer_gender');
-//            Mage::log($GuestPrefix , null, 'xulin.log');
+            $GuestPrefix = $order->getData('customer_gender');
             $GuestEmail = $addressForOrder->getData("email");
-//            if($GuestPrefix == "Herr"){
-//                $GuestPrefixCode = 1;
-//            }else{$GuestPrefixCode = 2;}
 
             $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefix, $GuestEmail);
             $base_path = Mage::getBaseDir('base');
-
             if($result['status'] != "emailmatched"){
                 if(count($result['customerids']) == 0){
-                    if(!is_dir($base_path."/media/new_customer")) {
-                        mkdir($base_path . "/media/new_customer", 0777);
+                    if(!is_dir($base_path."/var/new_customer")) {
+                        mkdir($base_path . "/var/new_customer", 0777);
                     }
-                    file_put_contents($base_path."/media/new_customer/customer_generate.txt", $orderInkreID.",",FILE_APPEND);
-                    $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/media/new_customer/customer_generate.txt"));
-                    file_put_contents($base_path."/media/new_customer/customer_generate.txt", $urString);
-                    return Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
+                    file_put_contents($base_path."/var/new_customer/customer_generate.txt", $orderInkreID.",",FILE_APPEND);
+                    $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/var/new_customer/customer_generate.txt"));
+                    file_put_contents($base_path."/var/new_customer/customer_generate.txt", $urString);
+		                  
+		            return Mage::log("Result: New Customer! ". $orderInkreID, null, 'xulin.log');
                 }else{
                     $dataToAssign = $this->getFullMatched($result['customerids'], $orderInkreID, $addressForOrder);
                     if($dataToAssign['status'] == 'matched'){
@@ -38,18 +34,18 @@ class Nextorder_Guesttoreg_Model_Observer{
                         $this->_assignOrder($order_saved, $dataToAssign['customerid']);
                     }else{
 //                    return Mage::log("Result: To Hold! ". $orderInkreID, null, 'xulin.log');
-                        if(!is_dir($base_path."/media/new_customer")) {
-                            mkdir($base_path . "/media/new_customer", 0777);
+                        if(!is_dir($base_path."/var/new_customer")) {
+                            mkdir($base_path . "/var/new_customer", 0777);
                         }
-                        file_put_contents($base_path."/media/new_customer/customer_verdacht.txt", $orderInkreID."@".implode(",",$result['customerids'])."&",FILE_APPEND);
-                        $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/media/new_customer/customer_verdacht.txt"));
-                        file_put_contents($base_path."/media/new_customer/customer_generate.txt", $urString);
+                        file_put_contents($base_path."/var/new_customer/customer_verdacht.txt", $orderInkreID."@".implode(",",$result['customerids'])."&",FILE_APPEND);
+                        $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/var/new_customer/customer_verdacht.txt"));
+                        file_put_contents($base_path."/var/new_customer/customer_verdacht.txt", $urString);
                         return Mage::log("Result: Order to Hold! ". $orderInkreID, null, 'xulin.log');
                     }
                 }
             }else{
                 $order_saved = Mage::getModel('sales/order')->loadByIncrementId($orderInkreID);
-                $this->_assignOrder($order_saved, (int)$result['customerid']);
+                $this->_assignOrder($order_saved, $result['customerid']);
                 return Mage::log("Result: matched by Email! ". $orderInkreID, null, 'xulin.log');
             }
         }
@@ -70,6 +66,7 @@ class Nextorder_Guesttoreg_Model_Observer{
         foreach($customers as $customer){
 
             if($email == $customer->getEmail()){
+                Mage::log("Email Matched", null, 'xulin.log');
                 return array("status"=>"emailmatched", "customerid"=>$customer->getId());
             }
             if(
@@ -110,11 +107,6 @@ class Nextorder_Guesttoreg_Model_Observer{
                 ($basicCustomerData->getLastname() != $billingAddress->getLastname())
             ){
                 Mage::log("no same Default Address", null, 'xulin.log');
-//                Mage::log($basicCustomerData->getFirstname(), null, 'xulin.log');
-//                Mage::log($basicCustomerData->getLastname(), null, 'xulin.log');
-//                Mage::log($billingAddress->getFirstname(), null, 'xulin.log');
-//                Mage::log($billingAddress->getLastname(), null, 'xulin.log');
-//                Mage::log($basicCustomerData->getFirstname()." ".$basicCustomerData->getLastname()." ".$billingAddress->getFirstname()." ".$billingAddress->getLastname(), null, 'xulin.log');
                 continue;
             }
             else{
@@ -181,12 +173,12 @@ class Nextorder_Guesttoreg_Model_Observer{
         $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
         $customer = Mage::getModel("customer/customer")->load($customerid);
         $customer->setWebsiteId($websiteId);
-
         $order->setCustomerId($customer->getId());
         $order->setCustomerIsGuest(0);
         $order->setCustomerGroupId($customer->getData('group_id'));
         $order->addStatusHistoryComment('Generiert von Gast Bestellung');
         $order->save();
+        return true;
     }
 }
 ?>
