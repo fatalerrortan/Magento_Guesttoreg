@@ -80,8 +80,7 @@ class Nextorder_Guesttoreg_Adminhtml_GuesttoregController extends Mage_Adminhtml
         $order = Mage::getModel("sales/order")->loadByIncrementId($orderInkreId);
         $storeId = $order->getStoreId();
         $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
-        $customer = Mage::getModel("customer/customer")->load($customerid);
-        $customer->setWebsiteId($websiteId);
+        $customer = Mage::getModel("customer/customer")->setWebsiteId($websiteId)->load($customerid);
         $order->setCustomerId($customerid);
         $order->setCustomerIsGuest(0);
         $order->setCustomerGroupId($customer->getData('group_id'));

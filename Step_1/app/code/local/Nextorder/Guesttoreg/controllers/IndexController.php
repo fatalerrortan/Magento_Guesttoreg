@@ -9,7 +9,17 @@
 
         public function indexAction(){
 
-            echo "this is a Test";
+            $collection = Mage::getResourceModel('sales/order_collection')
+//            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
+                ->addFieldToSelect('*')
+////            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
+                ->addAttributeToFilter('increment_id', array('like' => '13%-16-105'))
+                ->addFieldToFilter('customer_group_id', 0);
+
+                foreach($collection as $item){
+
+                    echo $item->getData('increment_id')."<br/>";
+                }
         }
 
         public function index_1Action(){

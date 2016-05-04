@@ -22,24 +22,15 @@
             </guesttoreg>
         </models>
         <events>
-
-            <!--<sales_order_save_commit_after>-->
-                <!---->
-            <!--</sales_order_save_commit_after>-->
-
-            <!--<sales_order_place_after>-->
-          <!---->
-            <!--</sales_order_place_after>-->
-
-            <checkout_submit_all_after>
-                <observers>
-                    <guesttoreg_event_for_order_assign>
-                        <type>singleton</type>
-                        <class>guesttoreg/observer</class>
-                        <method>_afterOrderSaved</method>
-                    </guesttoreg_event_for_order_assign>
-                </observers>
-            </checkout_submit_all_after>
+            <!--<checkout_submit_all_after>-->
+                <!--<observers>-->
+                    <!--<guesttoreg_event_for_order_assign>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>guesttoreg/observer</class>-->
+                        <!--<method>_afterOrderSaved</method>-->
+                    <!--</guesttoreg_event_for_order_assign>-->
+                <!--</observers>-->
+            <!--</checkout_submit_all_after>-->
         </events>
 
     </global>
@@ -90,23 +81,23 @@
 
     <crontab>
         <jobs>
-            <generate_new_customer_from_guest>
+            <Customer_Check_From_GuestOrder>
                 <schedule>
                     <cron_expr>*/20 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>guesttoreg/Cron::_readOrders</model>
+                    <model>guesttoreg/Cron::_getCustomerOrders</model>
                 </run>
-            </generate_new_customer_from_guest>
+            </Customer_Check_From_GuestOrder>
 
-            <customer_check_from_guest>
-                <schedule>
-                    <cron_expr>*/20 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>guesttoreg/Verdacht::_verdachtExcel</model>
-                </run>
-            </customer_check_from_guest>
+            <!--<customer_check_from_guest>-->
+                <!--<schedule>-->
+                    <!--<cron_expr>*/20 * * * *</cron_expr>-->
+                <!--</schedule>-->
+                <!--<run>-->
+                    <!--<model>guesttoreg/Verdacht::_verdachtExcel</model>-->
+                <!--</run>-->
+            <!--</customer_check_from_guest>-->
         </jobs>
     </crontab>
 
