@@ -13,7 +13,7 @@
 //            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
                 ->addFieldToSelect('*')
 ////            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
-                ->addAttributeToFilter('increment_id', array('like' => '13%-16-105'))
+                ->addAttributeToFilter('increment_id', array('like' => '12%-16-105'))
                 ->addFieldToFilter('customer_group_id', 0);
 
                 foreach($collection as $item){

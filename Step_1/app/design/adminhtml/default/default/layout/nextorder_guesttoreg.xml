@@ -7,12 +7,7 @@
     <adminhtml_guesttoreg_orderadmin>
         <!--<remove name="header" />-->
         <reference name="content">
-            <!--<action method="setTemplate">-->
-                <!--<template>nextorder/sales/showOrder.phtml</template>-->
-            <!--</action>-->
-
             <block type="guesttoreg/adminhtml_sales_orderassign" name="orderAssign" template="nextorder/sales/showOrder.phtml" />
-
         </reference>
     </adminhtml_guesttoreg_orderadmin>
 </layout>

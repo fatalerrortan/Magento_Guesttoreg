@@ -49,7 +49,16 @@
          $customer = Mage::getModel('customer/customer')->load($customerId);
          $billingAddress = $customer->getPrimaryBillingAddress();
         if($billingAddress == false){
-            return false;
+            return array(
+                'vorname' => $customer->getData("firstname"),
+                'nachname' => $customer->getData("lastname"),
+                'email' => $customer->getData("email"),
+                'telefon' => $customer->getData("telephone"),
+                'street' => "No Default Address",
+                'postcode' => "No Default Address",
+                'city' => "No Default Address",
+                'country' => "No Default Address",
+            );
         }else{
             return array(
                 'vorname' => $billingAddress->getData("firstname"),

@@ -22,8 +22,9 @@ class Nextorder_Guesttoreg_Block_Adminhtml_Sales_Guestorder_Grid extends Mage_Ad
 
         $collection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToSelect('*')
-            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
+//            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
             ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
+//            ->addAttributeToFilter('increment_id', array('like' => '13%-15-%'))
             ->addFieldToFilter('customer_group_id', 0);
 
         $this->setCollection($collection);

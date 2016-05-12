@@ -17,8 +17,8 @@ class Nextorder_Guesttoreg_Model_Cron{
 //            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
             ->addFieldToSelect('*')
 ////            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
-//            ->addAttributeToFilter('increment_id', array('like' => '13%-16-105'))
-            ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
+            ->addAttributeToFilter('increment_id', array('like' => '12%-16-105'))
+//            ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
             ->addFieldToFilter('customer_group_id', 0);
 
         foreach ($collection as $order) {
@@ -109,6 +109,7 @@ class Nextorder_Guesttoreg_Model_Cron{
             ->setEmail($addressForOrder->getData("email"))
             ->setData('prefix', $addressForOrder->getData("prefix"))
             ->setData('gender', ($addressForOrder->getData("prefix") == 'Herr') ? 1 : 2)
+            ->setData('telephone', $addressForOrder->getData('telephone'))
             ->setPassword('testtest');
         $customer->save();
         $this->_orderAssign($orderInkreId, $customer->getId());
@@ -142,7 +143,7 @@ class Nextorder_Guesttoreg_Model_Cron{
         $customAddress   = Mage::getModel('customer/address');
         $customAddress->setData($billingAddress)
             ->setCustomerId($customerid)
-            ->setIsDefaultBilling('1')  // set as default for billing
+            ->setIsDefaultBilling('1')  // set as default f93743or billing
             ->setIsDefaultShipping('1') // set as default for shipping
             ->setSaveInAddressBook('1');
         $customAddress->save();
@@ -160,7 +161,7 @@ class Nextorder_Guesttoreg_Model_Cron{
         $order->setCustomerId($customer->getId());
         $order->setCustomerIsGuest(0);
         $order->setCustomerGroupId($customer->getData('group_id'));
-        $order->addStatusHistoryComment('Generiert von Gast Bestellung(Neue Kunden)');
+        $order->addStatusHistoryComment('Generiert von Gast Bestellung');
         $order->save();
 //        Mage::log("Order: ".$orderInkreId." und Email: ".$email, null, 'xulin.log');
 
@@ -176,7 +177,7 @@ class Nextorder_Guesttoreg_Model_Cron{
         $order->setCustomerId($customerid);
         $order->setCustomerIsGuest(0);
         $order->setCustomerGroupId($customer->getData('group_id'));
-        $order->addStatusHistoryComment('Generiert von Gast Bestellung(Neue Kunden)');
+        $order->addStatusHistoryComment('Generiert von Gast Bestellung');
         $order->save();
 
         return true;
