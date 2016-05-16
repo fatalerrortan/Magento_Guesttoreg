@@ -31,6 +31,15 @@
                     <!--</guesttoreg_event_for_order_assign>-->
                 <!--</observers>-->
             <!--</checkout_submit_all_after>-->
+            <!--<admin_system_config_changed_section_section_reg>-->
+                <!--<observers>-->
+                    <!--<refundbanking>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>refundbanking/observer</class>-->
+                        <!--<method>_beforeConfigSave</method>-->
+                    <!--</refundbanking>-->
+                <!--</observers>-->
+            <!--</admin_system_config_changed_section_section_reg>-->
         </events>
 
     </global>
@@ -45,13 +54,6 @@
                 </args>
             </guesttoreg>
         </routers>
-        <!--<layout>-->
-            <!--<updates>-->
-                <!--<guesttoreg module="Nextorder_Guesttoreg">-->
-                <!--</guesttoreg>-->
-            <!--</updates>-->
-        <!--</layout>-->
-
     </frontend>
 
     <admin>

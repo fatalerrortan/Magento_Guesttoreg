@@ -23,6 +23,19 @@
                            </guesttoreg>
                        </children>
                    </sales>
+
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <section_reg translate="title" module="guesttoreg">
+                                        <title>Gast Bestellung Scanner</title>
+                                    </section_reg>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+
                 </children>
             </admin>
         </resources>

@@ -10,16 +10,17 @@ class Nextorder_Guesttoreg_Model_Cron{
 
 //    protected $cron_status = false;
     public $duplicateForEmail = array();
-    public function _getCustomerOrders(){
+    public function _getCustomerOrders($single_order){
 
         $base_path = Mage::getBaseDir('base');
+        $config_param = Mage::getStoreConfig('section_reg/group_reg/field_reg_start', Mage::app()->getStore());
         $collection = Mage::getResourceModel('sales/order_collection')
 //            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
-            ->addFieldToSelect('*')
+                ->addFieldToSelect('*')
 ////            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
-            ->addAttributeToFilter('increment_id', array('like' => '12%-16-105'))
+                ->addAttributeToFilter('increment_id', array('like' => $config_param))
 //            ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
-            ->addFieldToFilter('customer_group_id', 0);
+                ->addFieldToFilter('customer_group_id', 0);
 
         foreach ($collection as $order) {
 
@@ -30,27 +31,29 @@ class Nextorder_Guesttoreg_Model_Cron{
             $GuestFirstName = $addressForOrder->getData("firstname");
             $GuestPrefix = $order->getData('customer_gender');
             $GuestEmail = $addressForOrder->getData("email");
-//            Mage::log($orderInkreID." ".$GuestLastName." ".$GuestFirstName." ".$GuestPrefix." ".$GuestEmail, null, 'xulin.log');
             $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefix, $GuestEmail);
-            if($result['status'] != "emailmatched"){
-                if(count($result['customerids']) == 0){
-                    Mage::log("New Customer: ".$orderInkreID, null, 'xulin.log');
+            if ($result['status'] != "emailmatched") {
+                if (count($result['customerids']) == 0) {
+                    Mage::log("New Customer: " . $orderInkreID, null, 'xulin.log');
                     $this->_customerGenerate($orderInkreID);
                     $this->duplicateForEmail[] = $GuestEmail;
-                }else{
-                    Mage::log("Continue Compare: ".$orderInkreID, null, 'xulin.log');
-                    if(!is_dir($base_path."/var/new_customer")) {
+                } else {
+                    Mage::log("Continue Compare: " . $orderInkreID, null, 'xulin.log');
+                    if (!is_dir($base_path . "/var/new_customer")) {
                         mkdir($base_path . "/var/new_customer", 0777);
-                    }
-                    file_put_contents($base_path."/var/new_customer/customer_verdacht.txt", $orderInkreID."@".implode(",",$result['customerids'])."&",FILE_APPEND);
-                    $urString = str_replace(PHP_EOL,'',file_get_contents($base_path."/var/new_customer/customer_verdacht.txt"));
-                    file_put_contents($base_path."/var/new_customer/customer_verdacht.txt", $urString);
+                    }//       return $orderInkreID;
+
+                    file_put_contents($base_path . "/var/new_customer/customer_verdacht.txt", $orderInkreID . "@" . implode(",", $result['customerids']) . "&", FILE_APPEND);
+                    $urString = str_replace(PHP_EOL, '', file_get_contents($base_path . "/var/new_customer/customer_verdacht.txt"));
+                    file_put_contents($base_path . "/var/new_customer/customer_verdacht.txt", $urString);
                 }
-            }else{
-                Mage::log("Full Matched: ".$orderInkreID, null, 'xulin.log');
+            } else {
+                Mage::log("Full Matched: " . $orderInkreID, null, 'xulin.log');
                 $this->_orderAssignByEmail($orderInkreID, $GuestEmail);
             }
+
         }
+
     }
 
     public function getPreMatched($lastname, $firstname, $gender, $email){
@@ -114,14 +117,14 @@ class Nextorder_Guesttoreg_Model_Cron{
         $customer->save();
         $this->_orderAssign($orderInkreId, $customer->getId());
         $this->_setDefaultBillingAdress($billingID, $customer->getId());
-
-        return Mage::log("New Customer: ". $customer->getId(), null, 'xulin.log');
-    }
+        Mage::log("New Customer: ". $customer->getId(), null, 'xulin.log');
+        return $customer->getId();
+    }//       return $orderInkreID;
 
     protected function _setDefaultBillingAdress($billingID, $customerid){
-
-
-        $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
+        
+        $addressForOrder = Mage::getModel('sales/order_>l
+address')->load($billingID);
         $billingAddress = array (
             'prefix'     => $addressForOrder->getData('prefix'),
             'firstname'  => $addressForOrder->getData('firstname'),
@@ -164,8 +167,7 @@ class Nextorder_Guesttoreg_Model_Cron{
         $order->addStatusHistoryComment('Generiert von Gast Bestellung');
         $order->save();
 //        Mage::log("Order: ".$orderInkreId." und Email: ".$email, null, 'xulin.log');
-
-        return true;
+        return $customer->getId();
     }
 
     protected function _orderAssign($orderInkreId, $customerid){
@@ -182,55 +184,26 @@ class Nextorder_Guesttoreg_Model_Cron{
 
         return true;
     }
-//    public function _readOrders(){
-//
-//        $base_path = Mage::getBaseDir('base');
-//        $orgin_string = file_get_contents($base_path."/var/new_customer/customer_generate.txt");
-//        $string_to_array = explode(',',$orgin_string);
-////        array_pop($string_to_array);
-//        unset($string_to_array[count($string_to_array)-1]);
-//        foreach($string_to_array as $orderInkreId){
-//
-//                $result = $this->_customerGenerate($orderInkreId, $this->duplicateForEmail);
-//                $this->duplicateForEmail[] = $result[1];
-//        }
-//        file_put_contents($base_path."/var/new_customer/customer_generate.txt", "");
-//        return "Neue Kunden sind generiert worden.";
-//    }
 
-//    public function _generateExcel($dataToExcel){
-//
-//        /** Error reporting */
-//        error_reporting(E_ALL);
-//        ini_set('display_errors', TRUE);
-//        ini_set('display_startup_errors', TRUE);
-//        date_default_timezone_set('Europe/Berlin');
-//        define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
-//
-//        $objPHPExcel = new PHPExcel();
-//// Set document properties
-//        $adminUser = Mage::getSingleton('admin/session')->getUser()->getUsername();
-//        $objPHPExcel->getProperties()->setCreator($adminUser)
-//            ->setLastModifiedBy($adminUser)
-//            ->setTitle("New Customers Generate at ".date("Y.m.d"))
-//            ->setSubject("New Customers Generate at ".date("Y.m.d"))
-//            ->setDescription("Cron generates New Customers and assigns order to Customers at ".date("Y.m.d"))
-//            ->setKeywords("New Customers")
-//            ->setCategory("New Customers");
-//// Add some data
-//        $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', 'Customer ID')
-//            ->setCellValue('B1', 'Assigned Increment Order ID');
-//        $index = 2;
-//        foreach($dataToExcel as $row){
-//            $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A'.$index, $row['customerid'])
-//                ->setCellValue('B'.$index, $row['orderinkreid']);
-//            $index++;
-//        }
-//// Save Excel 2007 file
-//        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-//        $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
-//        rename(str_replace('.php', '.xlsx', __FILE__), Mage::getBaseDir("base")."/var/new_customer/New_Customers_".date("Y.m.d").".xlsx");
-//
-//        return Mage::getBaseDir("base")."/var/new_customer/New_Customers_".date("Y.m.d").".xlsx";
-//    }
+    public function _singleOrder($single_order){
+
+    $base_path = Mage::getBaseDir('base');
+    $collection = Mage::getResourceModel('sales/order_collection')
+            ->addFieldToSelect('*')
+            ->addAttributeToFilter('increment_id', array('like' => $single_order));
+
+        foreach ($collection as $order) {
+            
+            $orderInkreID = $order->getIncrementId();
+            $billingID = $order->getBillingAddress()->getId();
+            $addressForOrder = Mage::getModel('sales/order_address')->load($billingID);
+            $GuestLastName = $addressForOrder->getData("lastname");
+            $GuestFirstName = $addressForOrder->getData("firstname");
+            $GuestPrefix = $order->getData('customer_gender');
+            $GuestEmail = $addressForOrder->getData("email");
+            $result = $this->getPreMatched($GuestLastName, $GuestFirstName, $GuestPrefix, $GuestEmail);
+
+            return $result;
+        }
+    }
 }

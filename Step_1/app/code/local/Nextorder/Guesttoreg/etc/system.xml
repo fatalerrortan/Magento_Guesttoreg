@@ -4,7 +4,7 @@
 
     <sections>
         <section_reg translate="label" module="guesttoreg">
-            <label>Gast Bestellung Kontroller</label>
+            <label>Gast Bestellung Scanner</label>
             <tab>nextorder_extensions</tab>
             <frontend_type>text</frontend_type>
                <sort_order>1100</sort_order>
@@ -13,32 +13,33 @@
             <show_in_store>1</show_in_store>
             <groups>
                 <group_reg translate="label" module="guesttoreg">
-                    <label>Bestellungen im Verdacht</label>
+                    <label>Interval für Cron Job Customer_Check_From_GuestOrder</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>10</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <field_reg_tab translate="label" module="guesttoreg">
-                            <label>Verdacht Tabelle</label>
-                            <frontend_model>guesttoreg/adminhtml_system_config_verdachttable</frontend_model>
+                        <field_reg_start translate="label" module="guesttoreg">
+                            <label>Expression für Scanning-Bereich der Gast-Bestellung </label>
+                            <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </field_reg_tab>
+                            <comment><![CDATA[z.B. Alle Gast-Bestellung von 2016 => %-16-105]]></comment>
+                        </field_reg_start>
 
-                        <field_reg_config translate="label" module="guesttoreg">
-                            <label>Gast Bestellung Zuodrnen</label>
-                            <frontend_type>text</frontend_type>
-                            <frontend_model>guesttoreg/adminhtml_system_config_orderassign</frontend_model>
-                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </field_reg_config>
+                        <!--<field_reg_config translate="label" module="guesttoreg">-->
+                            <!--<label>Gast Bestellung Zuodrnen</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<frontend_model>guesttoreg/adminhtml_system_config_orderassign</frontend_model>-->
+                            <!--<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>-->
+                            <!--<sort_order>20</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                        <!--</field_reg_config>-->
                     </fields>
                 </group_reg>
             </groups>

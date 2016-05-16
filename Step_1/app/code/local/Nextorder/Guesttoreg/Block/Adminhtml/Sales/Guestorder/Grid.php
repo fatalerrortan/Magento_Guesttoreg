@@ -5,13 +5,12 @@
  * Date: 11.04.16
  * Time: 14:07
  */
-class Nextorder_Guesttoreg_Block_Adminhtml_Sales_Guestorder_Grid extends Mage_Adminhtml_Block_Widget_Grid
-{
+class Nextorder_Guesttoreg_Block_Adminhtml_Sales_Guestorder_Grid extends Mage_Adminhtml_Block_Widget_Grid{
 
     public function __construct(){
 
         parent::__construct();
-//        $this->setId('inchoo_order_grid');
+        $this->setId('guest_order');
         $this->setDefaultSort('increment_id');
         $this->setDefaultDir('DESC');
         $this->setSaveParametersInSession(true);
@@ -23,12 +22,9 @@ class Nextorder_Guesttoreg_Block_Adminhtml_Sales_Guestorder_Grid extends Mage_Ad
         $collection = Mage::getResourceModel('sales/order_collection')
             ->addFieldToSelect('*')
 //            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
-            ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
-//            ->addAttributeToFilter('increment_id', array('like' => '13%-15-%'))
+//            ->addAttributeToFilter('increment_id', array('like' => '%-16-%'))
             ->addFieldToFilter('customer_group_id', 0);
-
         $this->setCollection($collection);
-//        Mage::log($collection, null, 'xulin.log');
         parent::_prepareCollection();
         return $this;
     }

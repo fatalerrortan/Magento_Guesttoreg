@@ -9,30 +9,18 @@
 
         public function indexAction(){
 
-            $collection = Mage::getResourceModel('sales/order_collection')
-//            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
-                ->addFieldToSelect('*')
-////            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
-                ->addAttributeToFilter('increment_id', array('like' => '12%-16-105'))
-                ->addFieldToFilter('customer_group_id', 0);
-
-                foreach($collection as $item){
-
-                    echo $item->getData('increment_id')."<br/>";
-                }
+            $customer = Mage::getModel("customer/customer")->load(93741)->setData('telephone', 4564654)->save();
+            Zend_Debug::dump($customer);
+//            $customer->setData('telephone', 4564654);
+//
+//            $customer->save();
+//            echo $customer->getId();
         }
 
         public function index_1Action(){
 
-            $orderCollection = Mage::getModel("sales/order")->getCollection()
-                ->addFieldToSelect('*')
-                ->addFieldToFilter('customer_is_guest',1)
-                ->addFieldToFilter('increment_id', 100000181);
-
-            foreach( $orderCollection  as $eachorder){
-
-                Zend_Debug::dump($eachorder->getData());
-            }
+//           var_dump(Mage::getStoreConfig('section_reg/group_reg/field_reg_start', Mage::app()->getStore()));
+            echo Mage::getStoreConfig('section_reg/group_reg/field_reg_start', Mage::app()->getStore());
         }
 
         public function index_2Action()
