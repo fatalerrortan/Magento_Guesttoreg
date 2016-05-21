@@ -10,17 +10,23 @@ class Nextorder_Guesttoreg_Model_Cron{
 
 //    protected $cron_status = false;
     public $duplicateForEmail = array();
-    public function _getCustomerOrders($single_order){
+    public function _getCustomerOrders(){
 
         $base_path = Mage::getBaseDir('base');
         $config_param = Mage::getStoreConfig('section_reg/group_reg/field_reg_start', Mage::app()->getStore());
-        $collection = Mage::getResourceModel('sales/order_collection')
+        if(empty($config_param)){
+            $collection = Mage::getResourceModel('sales/order_collection')
 //            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
                 ->addFieldToSelect('*')
-////            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
-                ->addAttributeToFilter('increment_id', array('like' => $config_param))
-//            ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
+                ->addAttributeToFilter('increment_id', array('like' => '%-%-%'))
                 ->addFieldToFilter('customer_group_id', 0);
+        }else{
+            $collection = Mage::getResourceModel('sales/order_collection')
+//            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
+                ->addFieldToSelect('*')
+                ->addAttributeToFilter('increment_id', array('like' => $config_param))
+                ->addFieldToFilter('customer_group_id', 0);
+        }
 
         foreach ($collection as $order) {
 
@@ -51,9 +57,7 @@ class Nextorder_Guesttoreg_Model_Cron{
                 Mage::log("Full Matched: " . $orderInkreID, null, 'xulin.log');
                 $this->_orderAssignByEmail($orderInkreID, $GuestEmail);
             }
-
         }
-
     }
 
     public function getPreMatched($lastname, $firstname, $gender, $email){
@@ -100,25 +104,27 @@ class Nextorder_Guesttoreg_Model_Cron{
 
         if(in_array($addressForOrder->getData("email"), $this->duplicateForEmail)){
 
-            $this->_orderAssignByEmail($orderInkreId, $addressForOrder->getData("email"));
-        }else{
+           return $this->_orderAssignByEmail($orderInkreId, $addressForOrder->getData("email"));
+        }else {
 
-            }
-        $websiteId = Mage::getModel('core/store')->load($order->getStoreId())->getWebsiteId();
-        $customer = Mage::getModel("customer/customer");
-        $customer->setWebsiteId($websiteId)
-            ->setFirstname($addressForOrder->getData("firstname"))
-            ->setLastname($addressForOrder->getData("lastname"))
-            ->setEmail($addressForOrder->getData("email"))
-            ->setData('prefix', $addressForOrder->getData("prefix"))
-            ->setData('gender', ($addressForOrder->getData("prefix") == 'Herr') ? 1 : 2)
-            ->setData('telephone', $addressForOrder->getData('telephone'))
-            ->setPassword('testtest');
-        $customer->save();
-        $this->_orderAssign($orderInkreId, $customer->getId());
-        $this->_setDefaultBillingAdress($billingID, $customer->getId());
-        Mage::log("New Customer: ". $customer->getId(), null, 'xulin.log');
-        return $customer->getId();
+            $websiteId = Mage::getModel('core/store')->load($order->getStoreId())->getWebsiteId();
+            $customer = Mage::getModel("customer/customer");
+            $customer->setWebsiteId($websiteId)
+                ->setFirstname($addressForOrder->getData("firstname"))
+                ->setLastname($addressForOrder->getData("lastname"))
+                ->setEmail($addressForOrder->getData("email"))
+                ->setData('prefix', $addressForOrder->getData("prefix"))
+                ->setData('gender', ($addressForOrder->getData("prefix") == 'Herr') ? 1 : 2)
+                ->setData('telephone', $addressForOrder->getData('telephone'))
+                ->setPassword('testtest');
+            $customer->save();
+            $this->_orderAssign($orderInkreId, $customer->getId());
+            $this->_setDefaultBillingAdress($billingID, $customer->getId());
+            Mage::log("New Customer: " . $customer->getId(), null, 'xulin.log');
+
+            return $customer->getId();
+        }
+
     }//       return $orderInkreID;
 
     protected function _setDefaultBillingAdress($billingID, $customerid){
