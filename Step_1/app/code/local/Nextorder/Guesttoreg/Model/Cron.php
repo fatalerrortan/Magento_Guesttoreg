@@ -14,13 +14,17 @@ class Nextorder_Guesttoreg_Model_Cron{
 
         $base_path = Mage::getBaseDir('base');
         $config_param = Mage::getStoreConfig('section_reg/group_reg/field_reg_start', Mage::app()->getStore());
-        $collection = Mage::getResourceModel('sales/order_collection')
-//            ->addAttributeToFilter('increment_id', array('in' => '1380-16-105'));
+        if(empty($config_param)){
+            $collection = Mage::getResourceModel('sales/order_collection')
                 ->addFieldToSelect('*')
-////            ->addAttributeToFilter('increment_id', array('nin' => $this->getSusOrder()))
-                ->addAttributeToFilter('increment_id', array('like' => $config_param))
-//            ->addAttributeToFilter('increment_id', array('nlike' => '%-15-%'))
+                ->addAttributeToFilter('increment_id', array('like' => '$-$-$'))
                 ->addFieldToFilter('customer_group_id', 0);
+        }else{
+            $collection = Mage::getResourceModel('sales/order_collection')
+                ->addFieldToSelect('*')
+                ->addAttributeToFilter('increment_id', array('like' => $config_param))
+                ->addFieldToFilter('customer_group_id', 0);
+        }
 
         foreach ($collection as $order) {
 
