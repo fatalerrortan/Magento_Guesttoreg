@@ -10,7 +10,7 @@ class Nextorder_Guesttoreg_Model_Cron{
 
 //    protected $cron_status = false;
     public $duplicateForEmail = array();
-    public function _getCustomerOrders($single_order){
+    public function _getCustomerOrders(){
 
         $base_path = Mage::getBaseDir('base');
         $config_param = Mage::getStoreConfig('section_reg/group_reg/field_reg_start', Mage::app()->getStore());
