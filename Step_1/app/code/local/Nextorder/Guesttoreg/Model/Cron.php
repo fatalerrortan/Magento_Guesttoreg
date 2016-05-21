@@ -55,9 +55,7 @@ class Nextorder_Guesttoreg_Model_Cron{
                 Mage::log("Full Matched: " . $orderInkreID, null, 'xulin.log');
                 $this->_orderAssignByEmail($orderInkreID, $GuestEmail);
             }
-
         }
-
     }
 
     public function getPreMatched($lastname, $firstname, $gender, $email){
