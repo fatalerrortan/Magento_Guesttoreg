@@ -1,2 +1,2 @@
 # Magento_Guesttoreg
-Development for Assigning Guest Order to registered Customer
+Development for assigning Guest Order to registered Customer automatically after matching
